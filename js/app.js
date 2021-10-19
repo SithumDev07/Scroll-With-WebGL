@@ -6,6 +6,8 @@ import vertexShader from "./shaders/vertex.glsl";
 import gsap from "gsap";
 import * as dat from "dat.gui";
 
+import data from "../data.js";
+
 let speed = 0;
 let position = 0;
 let rounded = 0;
@@ -14,6 +16,14 @@ const wrapper = document.querySelector('.wrap');
 let elements = [...document.querySelectorAll('.n')];
 window.addEventListener('wheel', (e) => {
     speed += e.deltaY * 0.0003;
+})
+
+//* Mapping Images
+data.map((item, index) => {
+    let image = document.createElement('img');
+    elements[index].appendChild(image);
+    elements[index].querySelector('img').src = item.background;
+    elements[index].querySelector('img').width = 100;
 })
 
 let objects = Array(5).fill({dist: 0});
@@ -34,7 +44,7 @@ const requestAnimation = () => {
 
     position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.015;
 
-    wrapper.style.transform = `translate(0, ${-position * 100 + 50}px)`;
+    wrapper.style.transform = `translate(0, ${-position * 100 + 50}px)`; 
     window.requestAnimationFrame(requestAnimation);
 }
 
