@@ -1,0 +1,40 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    overflow: hidden;
+}
+
+.n{
+    position: absolute;
+    top: 100px;
+    width: 200px;
+    height: 15px;
+    background-color: #111;
+}
+
+.n1 {
+    top: 200px;
+}
+.n2 {
+    top: 300px;
+}
+.n3 {
+    top: 400px;
+}
+.n4 {
+    top: 500px;
+}
+.n5 {
+    top: 600px;
+}
+
+#block {
+    height: 100px;
+    width: 100px;
+    position: absolute;
+    background-color: #FF5500;
+}
