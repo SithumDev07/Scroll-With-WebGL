@@ -8,6 +8,8 @@ import * as dat from "dat.gui";
 
 import data from "../data.js";
 
+let attractMode = false;
+let attractTo = 0;
 let speed = 0;
 let position = 0;
 let rounded = 0;
@@ -190,11 +192,47 @@ const requestAnimation = () => {
 
     let diff = (rounded - position);
 
-    position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.035;
+    if(attractMode){
+        position += -(position - attractTo) * 0.08;
+    } else {
+        position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.035;
+    
+        wrapper.style.transform = `translate(0, ${-position * 100 + 50}px)`; 
+    }
 
-    wrapper.style.transform = `translate(0, ${-position * 100 + 50}px)`; 
     
     window.requestAnimationFrame(requestAnimation);
 }
 
 requestAnimation();
+
+let rots = sketch.groups.map(e => e.rotation);
+
+let navs = [...document.querySelectorAll('li')];
+let nav = document.querySelector('.nav');
+
+nav.addEventListener('mouseenter', (e) => {
+    attractMode = true;
+    gsap.to(rots, {
+        duration: 0.3,
+        x: -0.4,
+        y: 0,
+        z: 0
+    });
+})
+
+nav.addEventListener('mouseleave', (e) => {
+    attractMode = false;
+    gsap.to(rots, {
+        duration: 0.3,
+        x: -0.3,
+        y: -0.5,
+        z: -0.2
+    })
+})
+
+navs.forEach((item, _) => {
+    item.addEventListener('mouseover', (e) => {
+        attractTo = Number(e.target.getAttribute('data-nav'));
+    })
+})
