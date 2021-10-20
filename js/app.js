@@ -26,29 +26,7 @@ data.map((item, index) => {
     // elements[index].querySelector('img').width = 100;
 })
 
-let objects = Array(5).fill({dist: 0});
 
-const requestAnimation = () => {
-    position += speed;
-    speed *= 0.8;
-
-    objects.forEach((item, index) => {
-        item.dist = Math.min(Math.abs(position - index), 1);
-        item.dist = 1 - item.dist**2;
-        elements[index].style.transform = `scale(${1 + 0.4 * item.dist})`;
-    });
-
-    rounded = Math.round(position);
-
-    let diff = (rounded - position);
-
-    position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.015;
-
-    wrapper.style.transform = `translate(0, ${-position * 100 + 50}px)`; 
-    window.requestAnimationFrame(requestAnimation);
-}
-
-requestAnimation();
 
 export default class Sketch {
     constructor(options) {
@@ -91,6 +69,7 @@ export default class Sketch {
         images.forEach((item, index) => {
             let mat = this.material.clone();
             this.materials.push(mat);
+            mat.wireframe = true;
             
             mat.uniforms.texture1.value = new THREE.Texture(item);
             mat.uniforms.texture1.value.needsUpdate = true;
@@ -100,6 +79,7 @@ export default class Sketch {
             this.scene.add(mesh);
             this.meshes.push(mesh);
             mesh.position.y = index * 1.2;
+            // mesh.rotation.y = -0.5;
         });
 
     }
@@ -176,6 +156,35 @@ export default class Sketch {
     }
 }
 
-new Sketch({
+const sketch = new Sketch({
     dom: document.getElementById('container')
 });
+
+let objects = Array(5).fill({dist: 0});
+
+const requestAnimation = () => {
+    position += speed;
+    speed *= 0.8;
+
+    objects.forEach((item, index) => {
+        item.dist = Math.min(Math.abs(position - index), 1);
+        item.dist = 1 - item.dist**2;
+        elements[index].style.transform = `scale(${1 + 0.4 * item.dist})`;
+
+        let scale = 1 + 0.1 * item.dist;
+        sketch.meshes[index].position.y = index * 1.2 - position * 1.2;
+        sketch.meshes[index].scale.set(scale, scale, scale);
+    });
+
+    rounded = Math.round(position);
+
+    let diff = (rounded - position);
+
+    position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.015;
+
+    wrapper.style.transform = `translate(0, ${-position * 100 + 50}px)`; 
+    
+    window.requestAnimationFrame(requestAnimation);
+}
+
+requestAnimation();
