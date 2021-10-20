@@ -20,10 +20,10 @@ window.addEventListener('wheel', (e) => {
 
 //* Mapping Images
 data.map((item, index) => {
-    let image = document.createElement('img');
-    elements[index].appendChild(image);
-    elements[index].querySelector('img').src = item.background;
-    elements[index].querySelector('img').width = 100;
+    // let image = document.createElement('img');
+    // elements[index].appendChild(image);
+    // elements[index].querySelector('img').src = item.background;
+    // elements[index].querySelector('img').width = 100;
 })
 
 let objects = Array(5).fill({dist: 0});
@@ -80,6 +80,24 @@ export default class Sketch {
         this.resize();
         this.render();
         this.setUpResize();
+        // this.settings();
+        this.handleImages();
+    }
+    
+    handleImages(){
+        let images = [...document.querySelectorAll('img')];
+        images.forEach((item, index) => {
+            let mat = this.material.clone();
+            
+            mat.uniforms.texture1.value = new THREE.Texture(item);
+            mat.uniforms.texture1.value.needsUpdate = true;
+
+            let geo = new THREE.PlaneBufferGeometry(1.5, 1, 20, 20);
+            let mesh = new THREE.Mesh(geo, mat);
+            this.scene.add(mesh);
+            mesh.position.y = index * 1.2;
+        });
+
     }
 
     // settings() {
@@ -112,7 +130,11 @@ export default class Sketch {
             side: THREE.DoubleSide,
             uniforms: {
                 time: {value: 0},
-                resolution: {value: new THREE.Vector4()},
+                texture1: {type: "t", value: null},
+                resolution: {type: "v4",value: new THREE.Vector4()},
+                uvRate1: {
+                    value: new THREE.Vector2(1,1)
+                }
             },
             vertexShader: vertexShader,
             fragmentShader: fragmentShader
