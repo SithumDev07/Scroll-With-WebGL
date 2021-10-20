@@ -81,6 +81,8 @@ export default class Sketch {
         this.render();
         this.setUpResize();
         // this.settings();
+        this.materials = [];
+        this.meshes = [];
         this.handleImages();
     }
     
@@ -88,6 +90,7 @@ export default class Sketch {
         let images = [...document.querySelectorAll('img')];
         images.forEach((item, index) => {
             let mat = this.material.clone();
+            this.materials.push(mat);
             
             mat.uniforms.texture1.value = new THREE.Texture(item);
             mat.uniforms.texture1.value.needsUpdate = true;
@@ -95,6 +98,7 @@ export default class Sketch {
             let geo = new THREE.PlaneBufferGeometry(1.5, 1, 20, 20);
             let mesh = new THREE.Mesh(geo, mat);
             this.scene.add(mesh);
+            this.meshes.push(mesh);
             mesh.position.y = index * 1.2;
         });
 
@@ -129,7 +133,7 @@ export default class Sketch {
             },
             side: THREE.DoubleSide,
             uniforms: {
-                time: {value: 0},
+                time: {type: 'f', value: 0},
                 texture1: {type: "t", value: null},
                 resolution: {type: "v4",value: new THREE.Vector4()},
                 uvRate1: {
@@ -140,9 +144,9 @@ export default class Sketch {
             fragmentShader: fragmentShader
         });
         
-        this.geometry = new THREE.PlaneGeometry(1,1,1,1);
-        this.plane = new THREE.Mesh(this.geometry, this.material);
-        this.scene.add(this.plane);
+        // this.geometry = new THREE.PlaneGeometry(1,1,1,1);
+        // this.plane = new THREE.Mesh(this.geometry, this.material);
+        // this.scene.add(this.plane);
     }
 
     stop() {
@@ -159,7 +163,14 @@ export default class Sketch {
     render() {
         if(!this.isPlaying) return;
         this.time += 0.05;
-        this.material.uniforms.time.value = this.time;
+
+        if(this.materials){
+            this.materials.forEach(material => {
+                material.uniforms.time.value = this.time;
+            })
+        }
+
+        // this.material.uniforms.time.value = this.time;
         requestAnimationFrame(this.render.bind(this));
         this.renderer.render(this.scene, this.camera);
     }
