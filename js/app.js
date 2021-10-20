@@ -61,6 +61,8 @@ export default class Sketch {
         // this.settings();
         this.materials = [];
         this.meshes = [];
+        this.groups = [];
+
         this.handleImages();
     }
     
@@ -69,17 +71,22 @@ export default class Sketch {
         images.forEach((item, index) => {
             let mat = this.material.clone();
             this.materials.push(mat);
-            mat.wireframe = true;
-            
+            const group = new THREE.Group();
+
             mat.uniforms.texture1.value = new THREE.Texture(item);
             mat.uniforms.texture1.value.needsUpdate = true;
 
             let geo = new THREE.PlaneBufferGeometry(1.5, 1, 20, 20);
             let mesh = new THREE.Mesh(geo, mat);
-            this.scene.add(mesh);
+            group.add(mesh);
+            this.groups.push(group);
+            this.scene.add(group);
             this.meshes.push(mesh);
             mesh.position.y = index * 1.2;
-            // mesh.rotation.y = -0.5;
+
+            group.rotation.y = -0.5;
+            group.rotation.x = -0.3;
+            group.rotation.z = -0.2;
         });
 
     }
@@ -114,12 +121,14 @@ export default class Sketch {
             side: THREE.DoubleSide,
             uniforms: {
                 time: {type: 'f', value: 0},
+                distanceFromCenter: {type: 'f', value: 0},
                 texture1: {type: "t", value: null},
                 resolution: {type: "v4",value: new THREE.Vector4()},
                 uvRate1: {
                     value: new THREE.Vector2(1,1)
                 }
             },
+            transparent: true,
             vertexShader: vertexShader,
             fragmentShader: fragmentShader
         });
@@ -174,13 +183,14 @@ const requestAnimation = () => {
         let scale = 1 + 0.1 * item.dist;
         sketch.meshes[index].position.y = index * 1.2 - position * 1.2;
         sketch.meshes[index].scale.set(scale, scale, scale);
+        sketch.meshes[index].material.uniforms.distanceFromCenter.value = item.dist;
     });
 
     rounded = Math.round(position);
 
     let diff = (rounded - position);
 
-    position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.015;
+    position += Math.sign(diff) * Math.pow(Math.abs(diff), 0.7) * 0.035;
 
     wrapper.style.transform = `translate(0, ${-position * 100 + 50}px)`; 
     
